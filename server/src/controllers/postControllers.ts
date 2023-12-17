@@ -175,29 +175,29 @@ export const votes: RequestHandler = async (req, res) => {
         {
           // * Menambahkan field baru untuk mengecek apakah user sudah upvote atau belum
           $addFields: {
-            isVoted: { $in: [id, `$${voteField}.userId`] },
-            isOppositeVoted: { $in: [id, `$${oppositeVoteField}.userId`] },
+            isVoted: { $in: [id, `$${voteField}`] },
+            isOppositeVoted: { $in: [id, `$${oppositeVoteField}`] },
           },
         },
         {
           // * Memperbarui field berdasarkan apakah user sudah memberikan vote atau tidak
           $addFields: {
-            [`${voteField}.userId`]: {
+            [voteField]: {
               $cond: [
                 "$isVoted",
-                { $setDifference: [`$${voteField}.userId`, [id]] },
-                { $concatArrays: [`$${voteField}.userId`, [id]] },
+                { $setDifference: [`$${voteField}`, [id]] },
+                { $concatArrays: [`$${voteField}`, [id]] },
               ],
             },
-            [`${oppositeVoteField}.userId`]: {
+            [oppositeVoteField]: {
               $cond: [
                 "$isOppositeVoted",
-                { $setDifference: [`$${oppositeVoteField}.userId`, [id]] },
+                { $setDifference: [`$${oppositeVoteField}`, [id]] },
                 {
                   $cond: [
                     "$isVoted",
-                    { $setDifference: [`$${oppositeVoteField}.userId`, [id]] },
-                    `$${oppositeVoteField}.userId`,
+                    { $setDifference: [`$${oppositeVoteField}`, [id]] },
+                    `$${oppositeVoteField}`,
                   ],
                 },
               ],
@@ -207,8 +207,9 @@ export const votes: RequestHandler = async (req, res) => {
         {
           // * Menghitung jumlah vote
           $addFields: {
-            [`${voteField}.count`]: { $size: `$${voteField}.userId` },
-            [`${oppositeVoteField}.count`]: { $size: `$${oppositeVoteField}.userId` },
+            ["votesCount"]: {
+              $subtract: [{ $size: `$${voteField}` }, { $size: `$${oppositeVoteField}` }],
+            },
           },
         },
       ],

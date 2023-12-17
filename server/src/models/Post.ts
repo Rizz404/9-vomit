@@ -8,7 +8,7 @@ interface IPost {
   images: string[];
   upvotes: mongoose.Schema.Types.ObjectId[];
   downvotes: mongoose.Schema.Types.ObjectId[];
-  voteCount: number;
+  votesCount: number;
   commentsCount: number;
 }
 
@@ -23,7 +23,7 @@ const PostSchema = new mongoose.Schema<PostDocument>(
     description: String,
     upvotes: { type: [mongoose.SchemaTypes.ObjectId], ref: "User", default: [] },
     downvotes: { type: [mongoose.SchemaTypes.ObjectId], ref: "User", default: [] },
-    voteCount: { type: Number, default: 0 },
+    votesCount: { type: Number, default: 0 },
     commentsCount: { type: Number, default: 0 },
   },
   { timestamps: true }
